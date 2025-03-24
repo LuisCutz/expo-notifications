@@ -1,6 +1,7 @@
 import { useContext, createContext } from 'react';
 import { useStorageState } from './useStorageState';
 import axios from 'axios';
+
 const AuthContext = createContext({
   signIn: () => null,
   signOut: () => null,
@@ -8,7 +9,6 @@ const AuthContext = createContext({
   isLoading: false,
 });
 
-// This hook can be used to access the user info.
 export function useSession() {
   const value = useContext(AuthContext);
   if (process.env.NODE_ENV !== 'production') {
@@ -16,7 +16,6 @@ export function useSession() {
       throw new Error('useSession must be wrapped in a <SessionProvider />');
     }
   }
-
   return value;
 }
 
@@ -26,24 +25,24 @@ export function SessionProvider({ children }) {
   return (
     <AuthContext.Provider
       value={{
-        signIn: async (username, password) => {
-          // Perform sign-in logic here
-          const auth = await axios.post('https://clear-sunfish-fairly.ngrok-free.app/auth', {
-            username,
-            password
-          })
-          if(auth) {
-            setSession(auth.data.data.token);
-            return true
+        signIn: async (email, password) => {
+          try {
+            const response = await axios.post('https://regular-giraffe-worthy.ngrok-free.app/auth', {
+              email,
+              password
+            });
+            
+            if (response.data?.data?.token) {
+              await setSession(response.data.data.token);
+              return { success: true };
+            }
+            return { success: false, error: 'Credenciales incorrectas' };
+          } catch (error) {
+            return { 
+              success: false, 
+              error: error.response?.data?.message || 'Error al iniciar sesión'
+            };
           }
-          return false
-          /*
-          if(user === 'admin' && pass === 'admin') {
-            setSession('token');
-            return true
-          }
-          return false
-          */
         },
         signOut: () => {
           setSession(null);
@@ -55,4 +54,3 @@ export function SessionProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-

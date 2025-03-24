@@ -7,6 +7,7 @@ export default function Root() {
     <SessionProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="sign-in" options={{ headerShown: false }} />
       </Stack>
     </SessionProvider>
   );

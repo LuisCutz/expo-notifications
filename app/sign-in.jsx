@@ -6,9 +6,9 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useState } from "react";
-
 import { useSession } from "../utils/ctx";
 import { StatusBar } from "expo-status-bar";
 
@@ -16,13 +16,25 @@ export default function SignIn() {
   const { signIn } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
-    const success = await signIn(email, password);
-    if (success) {
+    if (!email || !password) {
+      setError("Por favor, rellena todos los campos");
+      return;
+    }
+    
+    setLoading(true);
+    setError("");
+    
+    const result = await signIn(email, password);
+    setLoading(false);
+    
+    if (result.success) {
       router.replace("/");
     } else {
-      alert("Invalid credentials");
+      setError(result.error);
     }
   };
 
@@ -30,24 +42,39 @@ export default function SignIn() {
     <View style={styles.container}>
       <StatusBar backgroundColor="gray" />
       <View style={styles.form}>
-        <Text>Sign In</Text>
+        <Text style={styles.title}>Expo notifications</Text>
+        <Text style={styles.subtitle}>Inicia sesión en tu cuenta</Text>
+        
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder="Correo electrónico"
           value={email}
-          onChangeText={(value) => setEmail(value)}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          editable={!loading}
         />
         <TextInput
           style={styles.input}
-          placeholder="Password"
+          placeholder="Contraseña"
           value={password}
           secureTextEntry
-          onChangeText={(value) => setPassword(value)}
+          onChangeText={setPassword}
+          editable={!loading}
         />
-        <TouchableOpacity onPress={handleLogin}>
-          <View style={styles.button}>
-            <Text style={styles.buttonText}>Sign In</Text>
-          </View>
+        
+        <TouchableOpacity 
+          onPress={handleLogin}
+          disabled={loading}
+          style={[styles.button, loading && styles.buttonDisabled]}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.buttonText}>Iniciar sesión</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -58,30 +85,63 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    backgroundColor: "#f5f5f5",
   },
   form: {
-    padding: 10,
-    margin: 10,
-    borderWidth: 1,
-    borderColor: "black",
+    padding: 20,
+    margin: 20,
+    borderRadius: 12,
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 24,
+    textAlign: "center",
   },
   input: {
-    margin: 10,
-    padding: 10,
+    marginBottom: 16,
+    padding: 12,
     borderWidth: 1,
-    borderColor: "black",
+    borderColor: "#ddd",
+    borderRadius: 8,
+    backgroundColor: "#f9f9f9",
+    fontSize: 16,
   },
   button: {
-    width: "auto",
-    margin: 10,
-    padding: 10,
     backgroundColor: "#0EA5E9",
-    color: "white",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  buttonDisabled: {
+    backgroundColor: "#93c5fd",
   },
   buttonText: {
     color: "white",
-    textAlign: "center",
+    fontSize: 16,
     fontWeight: "bold",
     textTransform: "uppercase",
+  },
+  error: {
+    color: "#ef4444",
+    marginBottom: 16,
+    textAlign: "center",
   },
 });

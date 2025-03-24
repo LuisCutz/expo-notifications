@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "auth_app",
-    "slug": "auth_app",
+    "name": "expo-notifications",
+    "slug": "expo-notifications",
+    "owner": "luisillodev",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,7 +22,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.efraindiaz.auth_app"
+      "package": "com.luisillodev.expo-notifications"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,7 +37,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "f1f4fd77-e95d-472c-9db6-e2466ad7ff51"
+        "projectId": "d8631582-c789-4e61-bca7-0d0a0d613297"
       }
     }
   }
