@@ -20,8 +20,8 @@ Para completar el proceso de inicio de sesión, es necesario modificar la implem
 La validación de credenciales debe realizarse mediante código duro, sin utilizar una API externa. Esto se hace por cuestiones prácticas, con la intención de integrar un servicio de autenticación más adelante.
 
 🔑 **Credenciales de prueba:**
-- 📧 **Correo:** `usuario@ejemplo.com`
-- 🔒 **Contraseña:** `password123`
+- 📧 **Correo:** `luis@email.com`
+- 🔒 **Contraseña:** `pass123`
 
 
 
