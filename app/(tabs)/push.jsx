@@ -129,7 +129,7 @@ export default function App() {
         <Text>Data: {notification ? JSON.stringify(notification.request.content.data) : ''}</Text>
       </View>
       <Button
-        title="Press to Send Notification"
+        title="Enviar notificación con la API"
         onPress={async () => {
           await sendPushNotificationToAPI(expoPushToken);
         }}
