@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Text, View, Button, Platform } from 'react-native';
+import { Text, View, Button, Platform, Alert } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
@@ -12,27 +12,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: true,
   }),
 });
-
-// Función para enviar una notificación push
-async function sendPushNotification(expoPushToken) {
-  const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: 'Original Title',
-    body: 'And here is the body!',
-    data: { someData: 'goes here' },
-  };
-
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
-}
 
 // Función para manejar errores en el registro de notificaciones
 function handleRegistrationError(errorMessage) {
@@ -80,7 +59,33 @@ async function registerForPushNotificationsAsync() {
   }
 }
 
-// Componente principal de la aplicación
+// Función para enviar el token a la API y enviar la notificación desde allí
+async function sendPushNotificationToAPI(expoPushToken) {
+  try {
+    const response = await fetch('https://regular-giraffe-worthy.ngrok-free.app/send-notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: expoPushToken,
+        title: 'Notificación 🔔',
+        body: "¡Hot-N-Ready!",
+        data: { customData: 'some data' },
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      Alert.alert('Notificación enviada correctamente desde la API');
+    } else {
+      Alert.alert('Error', data.message || 'Hubo un error al enviar la notificación');
+    }
+  } catch (error) {
+    Alert.alert('Error', 'No se pudo conectar a la API');
+  }
+}
+
 export default function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(undefined);
@@ -118,6 +123,7 @@ export default function App() {
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
       <Text>Your Expo push token: {expoPushToken}</Text>
       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ fontWeight: 'bold' }}>Última notificación recibida:</Text>
         <Text>Title: {notification?.request?.content?.title} </Text>
         <Text>Body: {notification?.request?.content?.body}</Text>
         <Text>Data: {notification ? JSON.stringify(notification.request.content.data) : ''}</Text>
@@ -125,7 +131,7 @@ export default function App() {
       <Button
         title="Press to Send Notification"
         onPress={async () => {
-          await sendPushNotification(expoPushToken);
+          await sendPushNotificationToAPI(expoPushToken);
         }}
       />
     </View>
